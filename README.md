@@ -34,10 +34,10 @@ All creative credit goes to the original developer. Please support them!
 * **PojavLauncher** installed on your Android device. (Testing was on the original Pojav Launcher.)
 * **Fabric** (Ensure you have the correct mod loader version installed: Fabric 1.20.1).
 ### Mods you will need
-* [**Geckolib**](https://modrinth.com/mod/geckolib)
+* [**Geckolib**](https://modrinth.com/mod/geckolib) (Fabric 1.20.1)
 * [**Simple Voice Chat**](https://modrinth.com/plugin/simple-voice-chat/version/fabric-1.20.1-2.6.11) (you need this exact version i think)
-* [**Fabric API**](https://modrinth.com/mod/fabric-api)
-* OPTIONAL: [**Sound Physics Remastered**](https://modrinth.com/mod/sound-physics-remastered/versions)
+* [**Fabric API**](https://modrinth.com/mod/fabric-api) (Fabric 1.20.1)
+* [**Sound Physics Remastered**](https://modrinth.com/mod/sound-physics-remastered/versions) (optional, Fabric 1.20.1)
 ---
 
 ## Disclaimer
