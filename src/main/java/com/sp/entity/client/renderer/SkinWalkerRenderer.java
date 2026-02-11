@@ -9,7 +9,7 @@ import com.sp.entity.custom.SkinWalkerEntity;
 import com.sp.entity.ik.model.GeckoLib.GeoModelAccessor;
 import com.sp.entity.ik.model.GeckoLib.MowzieGeoBone;
 import com.sp.entity.ik.parts.sever_limbs.ServerLimb;
-import com.sp.render.RenderLayers;
+// Removed RenderLayers import
 import it.unimi.dsi.fastutil.ints.IntIntImmutablePair;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 import net.minecraft.client.render.OverlayTexture;
@@ -391,10 +391,7 @@ public class SkinWalkerRenderer extends DynamicGeoEntityRenderer<SkinWalkerEntit
 
     @Override
     protected @Nullable RenderLayer getRenderTypeOverrideForBone(GeoBone bone, SkinWalkerEntity animatable, Identifier texturePath, VertexConsumerProvider bufferSource, float partialTick) {
-        if (Objects.equals(bone.getName(), "head") && InitializeComponents.SKIN_WALKER.get(animatable).isInTrueForm()) {
-            return RenderLayers.getDistortedEntity(texturePath);
-        }
-
+        // Removed custom RenderLayers logic
         return super.getRenderTypeOverrideForBone(bone, animatable, texturePath, bufferSource, partialTick);
     }
 }

@@ -1,8 +1,7 @@
 package com.sp.mixin.pbr;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.sp.render.VertexFormats;
-import com.sp.render.RenderLayers;
+// Removed VertexFormats and RenderLayers imports
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexFormat;
@@ -16,11 +15,8 @@ public class ChunkBuilderMixin {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk;beginBufferBuilding(Lnet/minecraft/client/render/BufferBuilder;)V"))
     private void beginPBR(ChunkBuilder.BuiltChunk instance, BufferBuilder buffer, @Local RenderLayer renderLayer){
-        if(renderLayer == RenderLayers.getPbrLayer()){
-            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.PBR);
-        } else {
-            buffer.begin(VertexFormat.DrawMode.QUADS, net.minecraft.client.render.VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL);
-        }
+        // Removed check for RenderLayers.getPbrLayer()
+        buffer.begin(VertexFormat.DrawMode.QUADS, net.minecraft.client.render.VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL);
     }
 
 }

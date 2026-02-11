@@ -1,7 +1,7 @@
 package com.sp.mixin.renderlayer;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.sp.render.RenderLayers;
+// Removed RenderLayers import
 import net.minecraft.client.render.RenderLayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,10 +14,8 @@ public class RenderLayerMixin {
 
     @ModifyReturnValue(method = "getBlockLayers", at = @At("RETURN"))
     private static List<RenderLayer> addRenderLayer(List<RenderLayer> original){
-        List<RenderLayer> list = new ArrayList<>(original);
-        list.add(RenderLayers.getPoolroomsSky());
-        list.add(RenderLayers.getPbrLayer());
-        return list;
+        // Simply return original list since custom layers are removed
+        return original;
     }
 
 }

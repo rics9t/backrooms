@@ -19,7 +19,8 @@ public class MonitorMixin {
     @Shadow @Final private List<VideoMode> videoModes;
     @Unique private static Integer maxRefreshRate = null;
 
-    @Inject(method = "populateVideoModes", at = @At(value = "INVOKE", target = "Lorg/lwjgl/glfw/GLFW;glfwGetMonitorPos(J[I[I)V"))
+    // Changed @At to TAIL to reliably run after modes are populated
+    @Inject(method = "populateVideoModes", at = @At("TAIL"))
     private void get43AspectRatios(CallbackInfo ci){
         //Find the highest refresh rate
         for(VideoMode videoMode : this.videoModes){

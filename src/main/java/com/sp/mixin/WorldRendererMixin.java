@@ -2,7 +2,7 @@ package com.sp.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.SPBRevampedClient;
-import com.sp.render.pbr.BlockIdMap;
+// Removed BlockIdMap import
 import com.sp.world.levels.BackroomsLevel;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -49,12 +49,7 @@ public abstract class WorldRendererMixin {
         }
     }
 
-    @Inject(method = "render", at = @At("HEAD"))
-    private void initBlockIDs(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci) {
-        if (!BlockIdMap.init) {
-            BlockIdMap.init();
-        }
-    }
+    // Removed initBlockIDs injection as BlockIdMap is deleted
 
     @Inject(method = "renderClouds(Lnet/minecraft/client/util/math/MatrixStack;Lorg/joml/Matrix4f;FDDD)V", at = @At("HEAD"), cancellable = true)
     public void renderClouds(MatrixStack matrices, Matrix4f projectionMatrix, float tickDelta, double cameraX, double cameraY, double cameraZ, CallbackInfo ci) {
@@ -80,4 +75,3 @@ public abstract class WorldRendererMixin {
     }
 
 }
-

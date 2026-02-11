@@ -1,7 +1,5 @@
 package com.sp.compat.modmenu;
 
-import com.sp.render.bird.BirdQuality;
-import com.sp.render.grass.GrassQuality;
 import eu.midnightdust.lib.config.MidnightConfig;
 
 public class ConfigStuff extends MidnightConfig {
@@ -64,11 +62,7 @@ public class ConfigStuff extends MidnightConfig {
     @Comment(category = SHADERS)
     public static Comment spacer5;
 
-    @Entry(category = SHADERS)
-    public static GrassQuality grassQuality = GrassQuality.MEDIUM;
-
-    @Entry(category = SHADERS)
-    public static BirdQuality birdQuality = BirdQuality.MEDIUM;
+    // Removed GrassQuality and BirdQuality entries due to missing classes
 
     @Entry(category = SERVER, min = 200, max = 1000)
     public static int exitSpawnRadius = 300;

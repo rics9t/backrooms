@@ -1,9 +1,7 @@
 package com.sp.mixin.pbr;
 
 import com.sp.mixininterfaces.BlockMaterial;
-import com.sp.render.VertexFormats;
-import com.sp.render.pbr.BlockIdMap;
-import com.sp.render.pbr.PbrRegistry;
+// Removed VertexFormats, BlockIdMap, PbrRegistry imports
 import net.minecraft.block.Block;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormat;
@@ -17,11 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.nio.ByteBuffer;
 
-/**
- * This Mixin adds additional vertex data to blocks when rendering:<br>
- * MaterialID for every block<br>
- * Zoom and Resolution for PBR blocks
- */
 @Mixin(BufferBuilder.class)
 public abstract class BufferBuilderMixin implements BlockMaterial {
     @Shadow public abstract void nextElement();
@@ -44,52 +37,14 @@ public abstract class BufferBuilderMixin implements BlockMaterial {
     private VertexFormat setFormat(VertexFormat format) {
         this.isRenderingBlock = false;
         currentFormat = format;
-
-        //Rendering a normal block. Redirect it to include the Custom Material
-        if (format == net.minecraft.client.render.VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL) {
-            return setRendering(com.sp.render.VertexFormats.BLOCKS);
-        }
-
-        //Rendering a PBR block. Redirect it to include the Zoom and resolution
-        if (format == com.sp.render.VertexFormats.PBR) {
-            return setRendering(com.sp.render.VertexFormats.PBR);
-        }
-
+        // PBR logic removed
         return format;
     }
 
 
     @Inject(method = "next", at = @At("HEAD"))
     private void putBlockID(CallbackInfo ci){
-        if (this.isRenderingBlock) {
-
-            //Normal Block
-            if(currentFormat == com.sp.render.VertexFormats.BLOCKS) {
-                this.buffer.putInt(this.elementOffset, BlockIdMap.getBlockID(this.currentBlock));
-                this.nextElement();
-            }
-
-            //PBR block
-            else if(this.currentFormat == com.sp.render.VertexFormats.PBR){
-                PbrRegistry.PbrMaterial material = PbrRegistry.getMaterial(this.currentBlock);
-                if (material == null) {
-                    return;
-                }
-
-                this.putFloat(0, material.zoom());
-                this.nextElement();
-
-                this.putInt(0, material.textureResolution());
-                this.nextElement();
-
-                this.putInt(0, material.enableHeight() ? 1 : 0);
-                this.nextElement();
-
-                this.putFloat(0, material.depthMultiplier());
-                this.nextElement();
-
-            }
-        }
+        // PBR logic removed
     }
 
     @Unique
