@@ -9,6 +9,7 @@ import com.sp.entity.client.renderer.SkinWalkerRenderer;
 import com.sp.entity.client.renderer.SmilerRenderer;
 import com.sp.entity.client.renderer.WalkerRenderer;
 import com.sp.init.*;
+import com.sp.render.PoolroomsDayCycle;
 import com.sp.networking.InitializePackets;
 import com.sp.networking.callbacks.ClientConnectionEvents;
 import com.sp.render.camera.CameraShake;
