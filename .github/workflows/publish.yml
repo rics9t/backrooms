@@ -1,0 +1,64 @@
+name: Build Release mod and upload it
+
+on:
+  push:
+  pull_request:
+  # Trigger the workflow when a Release is published
+  release:
+    types: [published]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        java: [ 17 ]
+        os: [ ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    
+    # Permission required to upload files to the Release page
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v3
+
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+
+      - name: Cache Gradle Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Make Gradle Wrapper Executable
+        if: ${{ runner.os != 'Windows' }}
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      # Keep this to save the file in the Actions Summary tab
+      - name: Capture Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build Artifacts
+          path: build/libs/
+
+      # NEW STEP: Only runs when a release is actually published
+      - name: Upload to Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          # This grabs all jars from the build folder. 
+          # You can specify a precise filename if you prefer.
+          files: build/libs/*.jar
