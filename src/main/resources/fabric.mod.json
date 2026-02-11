@@ -2,12 +2,13 @@
 	"schemaVersion": 1,
 	"id": "spb-revamped",
 	"version": "${version}",
-	"name": "SP-Backrooms Revamped",
-	"description": "Spacepotato's Found Footage Mod",
+	"name": "SP-Backrooms Revamped ANDROID",
+	"description": "Spacepotato's Found Footage Mod. Now compatible with Android devices. Shaders are removed. Unofficial modification",
 	"authors": [
 		"SpacePotato",
 		"Herr Chaos",
-		"MetaOne - Russian Translation"
+		"MetaOne - Russian Translation",
+		"Rics9t - Android compatibility"
 	],
 	"contact": {
 		"YouTube": "https://www.youtube.com/@SpacePotatoee"
