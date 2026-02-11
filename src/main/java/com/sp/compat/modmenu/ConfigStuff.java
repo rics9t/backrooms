@@ -43,6 +43,31 @@ public class ConfigStuff extends MidnightConfig {
     @Entry(category = VIDEO)
     public static boolean enableVHSAspectRatio = false;
 
+    // --- Missing Shaders/Render Settings Added Below ---
+
+    @Entry(category = SHADERS)
+    public static boolean enableShadows = true;
+
+    @Entry(category = SHADERS)
+    public static boolean enableVolumetricLight = true;
+
+    @Entry(category = SHADERS)
+    public static boolean enablePuddles = true;
+
+    @Entry(category = SHADERS)
+    public static boolean enableLevel1Fog = true;
+
+    @Entry(category = SHADERS)
+    public static boolean renderWaterReflections = true;
+
+    @Entry(category = SHADERS)
+    public static boolean renderBlockReflections = true;
+
+    @Entry(category = SHADERS)
+    public static boolean motionBlur = true;
+
+    // -------------------------------------------------
+
     @Entry(category = SHADERS)
     public static boolean enableVhsEffect = true;
 
@@ -61,8 +86,6 @@ public class ConfigStuff extends MidnightConfig {
 
     @Comment(category = SHADERS)
     public static Comment spacer5;
-
-    // Removed GrassQuality and BirdQuality entries due to missing classes
 
     @Entry(category = SERVER, min = 200, max = 1000)
     public static int exitSpawnRadius = 300;
