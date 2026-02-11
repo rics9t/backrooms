@@ -1,45 +1,26 @@
 package com.sp.mixin;
 
-import com.sp.SPBRevamped;
 import com.sp.SPBRevampedClient;
 import com.sp.compat.modmenu.ConfigStuff;
-import com.sp.render.ShadowMapRenderer;
 import com.sp.render.camera.CameraRoll;
 import com.sp.render.camera.CutsceneManager;
 import com.sp.util.MathStuff;
-import foundry.veil.api.client.render.VeilRenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = GameRenderer.class)
 public abstract class GameRendererMixin {
-    @Unique
-    Entity newCamera;
-    @Unique
-    private static final Identifier shadowSolid = new Identifier(SPBRevamped.MOD_ID, "shadowmap/rendertype_solid");
-
-    @Unique
-    private static final Identifier shadowEntity = new Identifier(SPBRevamped.MOD_ID, "shadowmap/rendertype_entity");
-
-    @Unique
-    private static final Identifier warpEntity = new Identifier("spbrevamped", "warp_player");
-
     @Unique
     private float smoothPitch = 0.0f;
 
@@ -48,14 +29,8 @@ public abstract class GameRendererMixin {
 
     @Shadow @Final MinecraftClient client;
 
-
     @Shadow public abstract void setBlockOutlineEnabled(boolean blockOutlineEnabled);
-    @Shadow public abstract void tick();
     @Shadow protected abstract void renderHand(MatrixStack matrices, Camera camera, float tickDelta);
-
-    @Shadow private static @Nullable ShaderProgram renderTypeEntityTranslucentProgram;
-
-    @Shadow public abstract void render(float tickDelta, long startTime, boolean tick);
 
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;tiltViewWhenHurt(Lnet/minecraft/client/util/math/MatrixStack;F)V"))
     public void renderWorld(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
@@ -111,14 +86,6 @@ public abstract class GameRendererMixin {
         return deg;
     }
 
-    /// Why are we doing this. Why are we overwriting this method? Space please tell me? best of wishes -Chaos
-
-    /// Dearest Chaos, Becasue I can -SpacePotato
-
-    /**
-     * @author
-     * @reason
-     */
     @Overwrite
     private void bobView(MatrixStack matrices, float tickDelta){
         if (this.client.getCameraEntity() instanceof PlayerEntity) {
@@ -138,51 +105,6 @@ public abstract class GameRendererMixin {
             }
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos(g * (float) Math.PI - 0.2F) * h) * multiplier));
         }
-    }
-
-
-    @Inject(method = {
-            "getRenderTypeSolidProgram",
-            "getRenderTypeCutoutProgram",
-            "getRenderTypeCutoutMippedProgram"
-    }, at = @At("HEAD"), cancellable = true)
-    private static void setSolidShader(CallbackInfoReturnable<ShaderProgram> cir) {
-        if(ShadowMapRenderer.isRenderingShadowMap()) {
-            foundry.veil.api.client.render.shader.program.ShaderProgram shader = VeilRenderSystem.renderer().getShaderManager().getShader(shadowSolid);
-            if (shader == null) {
-                return;
-            }
-            cir.setReturnValue(shader.toShaderInstance());
-        }
-    }
-
-    @Inject(method = {
-            "getRenderTypeEntityTranslucentProgram",
-            "getRenderTypeEntitySolidProgram",
-            "getRenderTypeEntityCutoutProgram",
-            "getRenderTypeEntityCutoutNoNullProgram",
-            "getRenderTypeEntityTranslucentCullProgram"
-    }, at = @At("TAIL"), cancellable = true)
-    private static void setPlayerShader(CallbackInfoReturnable<ShaderProgram> cir) {
-        if(ShadowMapRenderer.isRenderingShadowMap()) {
-            foundry.veil.api.client.render.shader.program.ShaderProgram shader = VeilRenderSystem.renderer().getShaderManager().getShader(shadowEntity);
-            if (shader == null) {
-                return;
-            }
-            cir.setReturnValue(shader.toShaderInstance());
-        }
-    }
-
-    @Inject(method = {
-            "getRenderTypeEntityTranslucentProgram"
-    }, at = @At("TAIL"), cancellable = true)
-    private static void setPlayerWarpShader(CallbackInfoReturnable<ShaderProgram> cir) {
-        foundry.veil.api.client.render.shader.program.ShaderProgram shader = VeilRenderSystem.renderer().getShaderManager().getShader(warpEntity);
-        if (shader == null || !SPBRevampedClient.shouldRenderWarp) {
-            cir.setReturnValue(renderTypeEntityTranslucentProgram);
-            return;
-        }
-        cir.setReturnValue(shader.toShaderInstance());
     }
 
     @Redirect(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V"))

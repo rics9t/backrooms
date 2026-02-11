@@ -4,7 +4,6 @@ import com.sp.SPBRevampedClient;
 import com.sp.compat.modmenu.ConfigStuff;
 import com.sp.util.TickTimer;
 import com.sp.util.Timer;
-import foundry.veil.api.client.util.Easings;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -24,11 +23,8 @@ public class InGameHudMixin {
 
     @Shadow @Final private MinecraftClient client;
 
-    @Shadow private int scaledHeight;
-
-    @Shadow @Final private static Identifier ICONS;
-
-    @Unique Timer hotbarSlideTimer = new Timer(500, Easings.Easing.easeInCirc, Easings.Easing.easeOutCirc);
+    // Timer using standard linear interpolation by default, can be extended for others
+    @Unique Timer hotbarSlideTimer = new Timer(500); 
     @Unique TickTimer hotbarHoldTimer = new TickTimer();
     @Unique Integer prevSelectedSlot = 0;
     @Unique double hotbarPosition;
@@ -71,7 +67,6 @@ public class InGameHudMixin {
     private void hotbarSlide2(DrawContext context, int x, int y, float f, PlayerEntity player, ItemStack stack, int seed, CallbackInfo ci){
         if (SPBRevampedClient.shouldRenderCameraEffect()) {
             context.getMatrices().push();
-
             if (!ConfigStuff.useDefaultGUI) {
                 context.getMatrices().translate(0, this.hotbarPosition, 0);
             }
@@ -85,10 +80,6 @@ public class InGameHudMixin {
         }
     }
 
-    
-
-
-    //RENDER HEALTH BAR
     @Inject(method = "renderHealthBar", at = @At("HEAD"))
     private void setHealthOpacity1(DrawContext context, PlayerEntity player, int x, int y, int lines, int regeneratingHeartIndex, float maxHealth, int lastHealth, int health, int absorption, boolean blinking, CallbackInfo ci){
         if (SPBRevampedClient.shouldRenderCameraEffect()) {
@@ -113,8 +104,6 @@ public class InGameHudMixin {
         }
     }
 
-
-    //RENDER HUNGER BAR
     @Inject(method = "renderStatusBars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;getHeartCount(Lnet/minecraft/entity/LivingEntity;)I", shift = At.Shift.AFTER))
     private void setHungerOpacity1(DrawContext context, CallbackInfo ci){
         if (SPBRevampedClient.shouldRenderCameraEffect()) {
@@ -139,8 +128,6 @@ public class InGameHudMixin {
         }
     }
 
-
-
     @Inject(method = {"renderExperienceBar", "renderCrosshair"}, at = @At("HEAD"), cancellable = true)
     private void disable(CallbackInfo ci){
         if (SPBRevampedClient.shouldRenderCameraEffect()) {
@@ -158,5 +145,4 @@ public class InGameHudMixin {
             }
         }
     }
-
 }

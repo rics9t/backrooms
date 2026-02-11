@@ -13,7 +13,6 @@ import com.sp.init.BackroomsLevels;
 import com.sp.init.ModSounds;
 import com.sp.sounds.entity.SkinWalkerChaseSoundInstance;
 import com.sp.world.levels.custom.Level0BackroomsLevel;
-import foundry.veil.api.client.util.Easings;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -108,7 +107,6 @@ public class SkinWalkerEntity extends HostileEntity implements GeoEntity, GeoAni
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 12.0f);
     }
 
-
     @Override
     protected void initGoals() {
         this.targetSelector.add(2, new SkinWalkerActiveTarget(this));
@@ -155,7 +153,6 @@ public class SkinWalkerEntity extends HostileEntity implements GeoEntity, GeoAni
             }
 
             if (!this.component.isInTrueForm() && !this.component.shouldBeginReveal()) {
-                //3600
                 if (this.age >= 2400 || this.component.getSuspicion() > this.maxSuspicion) {
                     this.component.setBeginReveal(true);
                 }
@@ -186,7 +183,6 @@ public class SkinWalkerEntity extends HostileEntity implements GeoEntity, GeoAni
         super.tick();
     }
 
-
     @Override
     protected @Nullable SoundEvent getAmbientSound() {
         return super.getAmbientSound();
@@ -201,7 +197,6 @@ public class SkinWalkerEntity extends HostileEntity implements GeoEntity, GeoAni
         this.setTarget(null);
         this.ticks++;
         this.getNavigation().stop();
-
 
         BackroomsLevels.getLevel(this.getWorld()).ifPresent((backroomsLevel -> {
             if (this.ticks == 9) {
@@ -326,7 +321,6 @@ public class SkinWalkerEntity extends HostileEntity implements GeoEntity, GeoAni
             if (bl && source.getAttacker() instanceof PlayerEntity) {
                 this.component.addSuspicion(100);
             }
-
             return bl;
         }
     }
@@ -361,7 +355,6 @@ public class SkinWalkerEntity extends HostileEntity implements GeoEntity, GeoAni
         return 360;
     }
 
-    //GECKO LIB STUFF
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 10, state -> {
@@ -391,7 +384,6 @@ public class SkinWalkerEntity extends HostileEntity implements GeoEntity, GeoAni
     @SuppressWarnings("InnerClassMayBeStatic")
     public class SkinWalkerLookControl extends LookControl{
         private int maxLookAtTimer = 5;
-        private final Easings.Easing easing = Easings.Easing.easeInOutCubic;
 
         public SkinWalkerLookControl(MobEntity entity) {
             super(entity);
@@ -409,7 +401,6 @@ public class SkinWalkerEntity extends HostileEntity implements GeoEntity, GeoAni
             this.maxPitchChange = (float)this.entity.getMaxLookPitchChange();
             this.lookAtTimer = lookTimer;
             this.maxLookAtTimer = lookTimer;
-//            this.easing;
         }
 
         @Override
@@ -421,14 +412,16 @@ public class SkinWalkerEntity extends HostileEntity implements GeoEntity, GeoAni
             } else {
                 this.entity.headYaw = this.changeAngle(this.entity.headYaw, this.entity.bodyYaw, 10.0F);
             }
-
             this.clampHeadYaw();
         }
 
         private float changeAngle2(float from, float to, float max){
             float f = MathHelper.subtractAngles(from, to);
             float g = MathHelper.clamp(f, -max, max);
-            return from + (g * this.easing.ease(1 - ((float) this.lookAtTimer / maxLookAtTimer)));
+            float progress = 1 - ((float) this.lookAtTimer / maxLookAtTimer);
+            // Replaced custom cubic easing with simple squared easing for smooth interpolation
+            float easedProgress = progress * progress * (3 - 2 * progress); 
+            return from + (g * easedProgress);
         }
 
         private static double getLookingHeightFor(Entity entity) {

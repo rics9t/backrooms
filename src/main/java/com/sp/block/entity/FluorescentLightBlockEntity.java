@@ -5,8 +5,6 @@ import com.sp.init.BackroomsLevels;
 import com.sp.init.ModBlockEntities;
 import com.sp.init.ModBlocks;
 import com.sp.world.levels.custom.Level0BackroomsLevel;
-import foundry.veil.api.client.render.VeilRenderSystem;
-import foundry.veil.api.client.render.deferred.light.PointLight;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -21,7 +19,6 @@ public class FluorescentLightBlockEntity extends BlockEntity {
     public Random random = Random.create();
     public java.util.Random random1 = new java.util.Random();
     public boolean playingSound;
-    public PointLight pointLight;
     public boolean prevOn;
     public final int randInt;
     public int ticks = 0;
@@ -37,23 +34,10 @@ public class FluorescentLightBlockEntity extends BlockEntity {
     @Override
     public void markRemoved() {
         super.markRemoved();
-
-        if (world == null) {
+        if (world == null || !world.isClient) {
             return;
         }
-
-        if (!world.isClient) {
-            return;
-        }
-
         this.setPlayingSound(false);
-
-        if (this.pointLight == null) {
-            return;
-        }
-
-        VeilRenderSystem.renderer().getDeferredRenderer().getLightRenderer().removeLight(this.pointLight);
-        this.pointLight = null;
     }
 
     public void tick(World world, BlockPos pos, BlockState state) {
@@ -65,7 +49,6 @@ public class FluorescentLightBlockEntity extends BlockEntity {
         this.currentState = state;
 
         if (!world.isClient) {
-            //Set to ceiling tile if it can't be seen
             if (world.getRegistryKey() == BackroomsLevels.LEVEL0_WORLD_KEY) {
                 if (world.getBlockState(pos.down()) != Blocks.AIR.getDefaultState()) {
                     world.removeBlockEntity(pos);
@@ -100,7 +83,7 @@ public class FluorescentLightBlockEntity extends BlockEntity {
                 if (!((BackroomsLevels.getLevel(this.getWorld()).orElse(BackroomsLevels.OVERWORLD_REPRESENTING_BACKROOMS_LEVEL)) instanceof Level0BackroomsLevel level)) {
                     return;
                 }
-                //Turn off if Blackout Event is active
+                
                 if (level.getLightState() == Level0BackroomsLevel.LightState.BLACKOUT) {
                     world.setBlockState(pos, world.getBlockState(pos).with(FluorescentLightBlock.BLACKOUT, true));
                 }
@@ -126,7 +109,6 @@ public class FluorescentLightBlockEntity extends BlockEntity {
             }
         }
 
-
         if (world.isClient) {
             doClientSideTick(world, pos, state, this);
         }
@@ -149,5 +131,4 @@ public class FluorescentLightBlockEntity extends BlockEntity {
     public BlockState getCurrentState(){
         return this.currentState;
     }
-
 }

@@ -4,7 +4,6 @@ import com.sp.render.bird.BirdQuality;
 import com.sp.render.grass.GrassQuality;
 import eu.midnightdust.lib.config.MidnightConfig;
 
-
 public class ConfigStuff extends MidnightConfig {
     public static final String VIDEO = "video";
     public static final String SHADERS = "shaders";
@@ -25,10 +24,8 @@ public class ConfigStuff extends MidnightConfig {
     @Entry(category = VIDEO, isSlider = true, min = 0, max = 1)
     public static float cameraSmoothing = 0.7f;
 
-
     @Comment(category = VIDEO)
     public static Comment spacer1;
-
 
     @Entry(category = VIDEO)
     public static boolean showHands = false;
@@ -39,18 +36,14 @@ public class ConfigStuff extends MidnightConfig {
     @Entry(category = VIDEO)
     public static boolean enableHint = true;
 
-
     @Comment(category = VIDEO)
     public static Comment spacer2;
-
 
     @Comment(category = VIDEO)
     public static Comment VhsAspectRatioComment;
 
     @Entry(category = VIDEO)
     public static boolean enableVHSAspectRatio = false;
-
-
 
     @Entry(category = SHADERS)
     public static boolean enableVhsEffect = true;
@@ -68,41 +61,6 @@ public class ConfigStuff extends MidnightConfig {
         return lightRenderDistance;
     }
 
-
-    @Comment(category = SHADERS)
-    public static Comment spacer3;
-
-
-    @Entry(category = SHADERS)
-    public static boolean enableShadows = true;
-
-    @Entry(category = SHADERS)
-    public static boolean enableVolumetricLight = true;
-
-    @Entry(category = SHADERS)
-    public static boolean enablePuddles = true;
-
-    @Entry(category = SHADERS)
-    public static boolean enableLevel1Fog = true;
-
-    @Entry(category = SHADERS)
-    public static boolean renderWaterReflections = true;
-
-    @Entry(category = SHADERS)
-    public static boolean renderBlockReflections = true;
-
-
-    @Comment(category = SHADERS)
-    public static Comment spacer4;
-
-
-    @Entry(category = SHADERS)
-    public static boolean motionBlur = true;
-
-    @Entry(category = SHADERS, isSlider = true, min = 0.1, max = 1, precision = 10)
-    public static float motionBlurStrength = 0.5f;
-
-
     @Comment(category = SHADERS)
     public static Comment spacer5;
 
@@ -112,9 +70,6 @@ public class ConfigStuff extends MidnightConfig {
     @Entry(category = SHADERS)
     public static BirdQuality birdQuality = BirdQuality.MEDIUM;
 
-
-
     @Entry(category = SERVER, min = 200, max = 1000)
     public static int exitSpawnRadius = 300;
-
 }

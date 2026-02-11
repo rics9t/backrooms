@@ -6,30 +6,12 @@ import com.sp.cca_stuff.PlayerComponent;
 import com.sp.compat.modmenu.ConfigStuff;
 import com.sp.init.BackroomsLevels;
 import com.sp.init.ModSounds;
-import com.sp.mixin.cutscene.PathAccessor;
-import com.sp.networking.InitializePackets;
-import com.sp.util.MathStuff;
-import foundry.veil.api.client.anim.Frame;
-import foundry.veil.api.client.anim.Keyframe;
-import foundry.veil.api.client.anim.Path;
-import foundry.veil.api.client.util.Easings;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 
-import java.util.List;
-
-/**
- * Will likely use in a future API if I ever feel like making it
- */
-@SuppressWarnings("DataFlowIssue")
 public class CutsceneManager {
     public boolean started;
     public boolean isPlaying;
@@ -41,10 +23,6 @@ public class CutsceneManager {
     private final int duration2;
     public BlackScreen blackScreen;
     private Entity camera;
-    private final Path cameraPathPos;
-    private final Path cameraPathRotX;
-    private final Path cameraPathRotY;
-    private final Path cameraPathRotZ;
     public float cameraRotZ;
     private final MinecraftClient client;
 
@@ -59,24 +37,7 @@ public class CutsceneManager {
         this.blackScreen = new BlackScreen();
         this.client = MinecraftClient.getInstance();
         this.cameraRotZ = 0;
-        this.cameraPathPos = new Path(List.of(
-                new Keyframe(new Vec3d(0.5,220,0.5), Vec3d.ZERO, Vec3d.ZERO, MathStuff.millisecToTick(this.duration), Easings.Easing.easeInSine),
-                new Keyframe(new Vec3d(0.5,27,0.5), Vec3d.ZERO, Vec3d.ZERO,0, Easings.Easing.linear)
-        ), false, false);
-        this.cameraPathRotX = new Path(List.of(
-                new Keyframe(Vec3d.ZERO, new Vec3d(80,0,0), Vec3d.ZERO,MathStuff.millisecToTick(this.duration) / 2, Easings.Easing.easeInOutSine),
-                new Keyframe(Vec3d.ZERO, new Vec3d(60,0,0), Vec3d.ZERO,MathStuff.millisecToTick(this.duration) / 2, Easings.Easing.easeInOutSine),
-                new Keyframe(Vec3d.ZERO, new Vec3d(110,0,0), Vec3d.ZERO,0, Easings.Easing.easeInOutSine)
-        ), false, false);
-        this.cameraPathRotY = new Path(List.of(
-                new Keyframe(Vec3d.ZERO, new Vec3d(0,0,0), Vec3d.ZERO, MathStuff.millisecToTick(this.duration), Easings.Easing.linear),
-                new Keyframe(Vec3d.ZERO, new Vec3d(0,120,0), Vec3d.ZERO,0, Easings.Easing.linear)
-        ), false, false);
-        this.cameraPathRotZ = new Path(List.of(
-                new Keyframe(Vec3d.ZERO, new Vec3d(0,0,20), Vec3d.ZERO, MathStuff.millisecToTick(this.duration) / 2, Easings.Easing.easeInOutSine),
-                new Keyframe(Vec3d.ZERO, new Vec3d(0,0,-20), Vec3d.ZERO,MathStuff.millisecToTick(this.duration) / 2, Easings.Easing.easeInOutSine),
-                new Keyframe(Vec3d.ZERO, new Vec3d(0,0,0), Vec3d.ZERO,0, Easings.Easing.easeInOutSine)
-        ), false, false);
+        // Paths removed as they required Veil animation API
     }
 
 
@@ -116,7 +77,6 @@ public class CutsceneManager {
                 ConfigStuff.lightRenderDistance = 1000;
                 this.startTime = System.currentTimeMillis();
                 this.isPlaying = true;
-//                SPBRevampedClient.getCameraShake().setCameraShake(MathStuff.millisecToTick(this.duration), 1, Easings.Easing.linear, true);
                 client.getSoundManager().play(PositionedSoundInstance.master(ModSounds.FALLING, 1.0f));
             }
             float timer = (float) (System.currentTimeMillis() - this.startTime) / this.duration;
@@ -132,11 +92,7 @@ public class CutsceneManager {
                 ConfigStuff.lightRenderDistance = this.prevLightRenderDistance;
             } else {
                 client.options.hudHidden = true;
-                Vec3d newCameraPos = lerpedCameraPos(timer);
-                Vec3d newCameraRot = lerpedCameraRot(timer);
-
-                this.cameraRotZ = (float) newCameraRot.z;
-                camera.refreshPositionAndAngles(newCameraPos.x, newCameraPos.y, newCameraPos.z, (float) newCameraRot.y, (float) newCameraRot.x);
+                // Complex camera movement logic removed to avoid Veil dependency
                 client.cameraEntity = camera;
             }
         }
@@ -158,39 +114,6 @@ public class CutsceneManager {
         }
     }
 
-    private Vec3d lerpedCameraRot(float timer){
-
-        double interpolateX = MathStuff.mod(timer * ((PathAccessor) cameraPathRotX).getFrames().size(), 1);
-        double currentFrameRotX = cameraPathRotX.frameAtProgress(timer).getRotation().x;
-        double prevFrameRotX = previousFrameAtProgress(cameraPathRotX, timer).getRotation().x;
-
-        double interpolateY = MathStuff.mod(timer * ((PathAccessor) cameraPathRotY).getFrames().size(), 1);
-        double currentFrameRotY = cameraPathRotY.frameAtProgress(timer).getRotation().y;
-        double prevFrameRotY = previousFrameAtProgress(cameraPathRotY, timer).getRotation().y;
-
-        double interpolateZ = MathStuff.mod(timer * ((PathAccessor) cameraPathRotZ).getFrames().size(), 1);
-        double currentFrameRotZ = cameraPathRotZ.frameAtProgress(timer).getRotation().z;
-        double prevFrameRotZ = previousFrameAtProgress(cameraPathRotZ, timer).getRotation().z;
-
-        return new Vec3d(
-                MathHelper.lerp(interpolateX, prevFrameRotX, currentFrameRotX),
-                MathHelper.lerp(interpolateY, prevFrameRotY, currentFrameRotY),
-                MathHelper.lerp(interpolateZ, prevFrameRotZ, currentFrameRotZ)
-        );
-    }
-
-    private Vec3d lerpedCameraPos(float timer){
-        double interpolatePos = MathStuff.mod(timer * ((PathAccessor) cameraPathPos).getFrames().size(), 1);
-        Vec3d currentFramePos = cameraPathPos.frameAtProgress(timer).getPosition();
-        Vec3d prevFramePos = previousFrameAtProgress(cameraPathPos, timer).getPosition();
-
-        return new Vec3d(
-                MathHelper.lerp(interpolatePos, prevFramePos.x, currentFramePos.x),
-                MathHelper.lerp(interpolatePos, prevFramePos.y, currentFramePos.y),
-                MathHelper.lerp(interpolatePos, prevFramePos.z, currentFramePos.z)
-        );
-    }
-
     public void reset(){
         PlayerComponent playerComponent = InitializeComponents.PLAYER.get(client.player);
         this.isPlaying = false;
@@ -207,24 +130,12 @@ public class CutsceneManager {
         playerComponent.setDoingCutscene(false);
 
         SPBRevampedClient.sendComponentSyncPacket(playerComponent.isDoingCutscene(), "cutscene");
-
     }
 
     private void initCamera(){
         this.camera = new ItemEntity(client.world, 1.5, 300, 1.5, ItemStack.EMPTY);
         this.camera.refreshPositionAndAngles(1.5, 300, 1.5, 0, 90);
     }
-
-    private Frame previousFrameAtProgress(Path path, double progress){
-        List<Frame> frames = ((PathAccessor) path).getFrames();
-        int index = (int) (frames.size() * progress) - 1;
-        if(index < 0){
-            return frames.get(0);
-        }
-        return frames.get(index);
-    }
-
-
 
     public class BlackScreen{
         public boolean isBlackScreen;
@@ -233,7 +144,6 @@ public class CutsceneManager {
         private long startTime;
         private boolean shouldPauseSounds;
 
-        //Duration in ticks
         public BlackScreen(){
             this.startTime = 0L;
             this.isBlackScreen = false;
@@ -249,7 +159,6 @@ public class CutsceneManager {
             client.options.hudHidden = true;
         }
 
-        //Tick
         public void tick(){
             if(isBlackScreen){
                 MinecraftClient client = MinecraftClient.getInstance();
@@ -274,7 +183,5 @@ public class CutsceneManager {
                 }
             }
         }
-
     }
-
 }

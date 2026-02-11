@@ -2,7 +2,6 @@ package com.sp.render;
 
 import com.sp.init.BackroomsLevels;
 import com.sp.world.levels.custom.PoolroomsBackroomsLevel;
-import foundry.veil.api.client.util.Easings;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.joml.Vector3f;
@@ -26,7 +25,6 @@ public class PoolroomsDayCycle {
             }
 
             if(level.isSunsetTransitioning()) {
-
                 if(!done) {
                     if (startTime == null) {
                         prevDayTime = dayTime;
@@ -35,7 +33,9 @@ public class PoolroomsDayCycle {
                     }
 
                     float timer = (float) (System.currentTimeMillis() - startTime) / 8000;
-                    dayTime = MathHelper.lerp(Easings.Easing.easeInOutQuad.ease(timer), prevDayTime, targetDayTime);
+                    // Standard cubic ease-in-out replacement
+                    float easedTimer = timer < 0.5 ? 4 * timer * timer * timer : 1 - (float)Math.pow(-2 * timer + 2, 3) / 2;
+                    dayTime = MathHelper.lerp(easedTimer, prevDayTime, targetDayTime);
 
                     if (timer >= 1.0) {
                         done = true;
@@ -54,18 +54,12 @@ public class PoolroomsDayCycle {
             if(dayTime >= 1.0f){
                 dayTime = 0.0f;
             }
-
             return currentTime;
-
         }
-
-
-
         return dayTime;
     }
 
     public static float getSunAngle() {
-
         if(dayTime <= 0.25) {
             return MathHelper.lerp((dayTime - 0.0f) / 0.25f, noonAngle, sunSetAngle);
         }
@@ -84,9 +78,7 @@ public class PoolroomsDayCycle {
         else if(dayTime <= 1.0){
             return MathHelper.lerp((dayTime-0.75f) / 0.25f, sunriseAngle, noonAngle);
         }
-
         return 90.0f;
-
     }
 
     public static Vector3f getLightColor(){
@@ -112,14 +104,10 @@ public class PoolroomsDayCycle {
         else if(dayTime <= 1.0){
             return orangeLightColor.lerp(whiteColor, (dayTime-0.75f) / 0.25f);
         }
-
-
         return whiteColor;
     }
 
     public static float getDayTime(World world){
         return advanceDayTime(world);
     }
-
-
 }
